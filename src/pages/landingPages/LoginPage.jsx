@@ -1,59 +1,92 @@
-import { useForm } from 'react-hook-form';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../hook/useAuthStore';
+import Cover from '../../components/landingComponents/Cover';
 
-function Form() {
-    const { login, isLoggingIn } = useAuthStore()
+const validationSchema = Yup.object().shape({
+    email: Yup.string().email("Invalid email format").required("Email is required!"),
+    password: Yup.string().required("Password is required!").min(6, "Password must be at least 6 characters"),
+});
+
+function LoginForm() {
+    const { login, isLoggingIn } = useAuthStore();
     const navigate = useNavigate();
-    const { register, handleSubmit, formState: { errors } } = useForm({ mode: "onChange" });
 
-    const onSubmit = async (formData) => {
-        await login(formData)
-        navigate('/dashboard')
+    const initialValues = { email: '', password: '' };
+
+    const handleSubmit = async (values, { setSubmitting }) => {
+        await login(values);
+        navigate('/dashboard');
+        setSubmitting(false);
     };
 
-    const handleError = (err) => {
-    }
-
-    const formOption = {
-        email: { required: "Email is required !" },
-        password: { required: "Password is required !" },
-    }
-
     return (
-        <div className="bg-white mx-auto my-24 p-6 border rounded-lg shadow-md w-[90%] container max-w-[30rem]">
-            <h2 className="text-xl font-semibold mb-4 text-gray-700">Hi, Welcome back!</h2>
-            <form onSubmit={handleSubmit(onSubmit, handleError)}>
-                <div className="mb-4">
-                    <input type="email" className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-customVoilet focus:outline-none" placeholder="Email"
-                        {...register("email", formOption.email)} />
-                    <span className='text-red-500 text-sm ml-2'>{errors?.email && errors.email.message}</span>
+        <div className="bg-white mx-auto my-24 p-8 rounded-lg shadow-inner w-[90%] max-w-md">
+            <h2 className="text-2xl font-semibold mb-6 text-gray-800 text-center">Welcome Back!</h2>
+            <Formik 
+                initialValues={initialValues}
+                validationSchema={validationSchema}
+                onSubmit={handleSubmit}
+            >
+                {({ isSubmitting }) => (
+                    <Form>
+                        {/* Email Input */}
+                        <div className="mb-5">
+                            <Field 
+                                type="email" 
+                                name="email"
+                                className="w-full px-4 py-3 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" 
+                                placeholder="Email"
+                            />
+                            <ErrorMessage name="email" component="span" className="text-red-500 text-sm ml-2" />
+                        </div>
 
-                </div>
-                <div className="mb-4">
-                    <input type="password" id="password" className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-customVoilet focus:outline-none" placeholder="Password"
-                        {...register("password", formOption.password)} />
-                    <span className='text-red-500 text-sm ml-2'>{errors?.password && errors.password.message}</span>
+                        {/* Password Input */}
+                        <div className="mb-5">
+                            <Field 
+                                type="password" 
+                                name="password"
+                                className="w-full px-4 py-3 border rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" 
+                                placeholder="Password"
+                            />
+                            <ErrorMessage name="password" component="span" className="text-red-500 text-sm ml-2" />
+                        </div>
 
-                </div>
-                <div className="flex items-center justify-between my-6">
-                    <Link to="#" className="mx-2 text-customBlue text-sm hover:underline">Forgot?</Link>
-                </div>
-                <button className="w-full bg-customBlue/90 text-white py-2 rounded-md hover:bg-customBlue/80 transition" disabled={isLoggingIn}>Sign In</button>
-            </form>
+                        {/* Forgot Password Link */}
+                        <div className="flex justify-end mb-6">
+                            <Link to="#" className="text-indigo-600 text-sm hover:underline">Forgot Password?</Link>
+                        </div>
+
+                        {/* Sign In Button */}
+                        <button 
+                            type="submit"
+                            className={`w-full bg-customPurple text-white py-3 rounded-md font-semibold transition-transform duration-300 hover:bg-customOrange active:scale-95 disabled:bg-gray-400`}
+                            disabled={isSubmitting || isLoggingIn}
+                        >
+                            {isSubmitting || isLoggingIn ? "Signing In..." : "Sign In"}
+                        </button>
+                    </Form>
+                )}
+            </Formik>
+
+            {/* Signup Redirect */}
             <p className="mt-6 text-center text-gray-600">
-                Don't have an account? <Link to="/signup" className="text-customBlue hover:underline">Register Now</Link>
+                Don't have an account? <Link to="/signup" className="text-indigo-600 font-semibold hover:underline">Register Now</Link>
             </p>
         </div>
-    )
+    );
 }
 
 function LoginIn() {
     return (
-        <main className='w-full h-fit'>
-            <Form />
+        <Cover>
+
+        <main className="w-full max-h-screen flex items-center justify-center ">
+            <LoginForm />
         </main>
-    )
+        </Cover>
+    );
 }
 
-export default LoginIn
+export default LoginIn;

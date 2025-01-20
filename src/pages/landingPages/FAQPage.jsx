@@ -1,198 +1,111 @@
-import Cover from "../../components/landingComponents/Cover"
-import { useState } from "react"
-import { useForm } from 'react-hook-form'
-import { ChevronUp, ChevronDown } from 'lucide-react'
+import { useState } from "react";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import { ChevronUp, ChevronDown } from "lucide-react";
+import Cover from "../../components/landingComponents/Cover";
 
 function FAQ() {
-    const [openAnswer, setOpenAnswer] = useState(-1);
+    const [openIndex, setOpenIndex] = useState(-1);
 
     const faqs = [
-        {
-            question: "What is Learnium, and how does it work?",
-            answer: "Learnium is a virtual study group platform where users can create or join groups, participate in online study sessions, share notes and files, and interact with an AI assistant for instant doubt resolution. It is designed to facilitate collaborative and effective online learning."
-        },
-        {
-            question: "How do I create or join a study group?",
-            answer: "You can create a new group by selecting a subject or field of interest and inviting members, or you can browse and join existing groups that match your preferences. The platform makes it easy to find and connect with like-minded learners."
-        },
-        {
-            question: "What features are available during online study sessions?",
-            answer: "Online study sessions include features like video conferencing, collaborative whiteboards, file sharing, live chat, and access to AI assistance for answering questions. These tools help make study sessions engaging and productive."
-        },
-        {
-            question: "Can I share notes and resources with my group members?",
-            answer: "Yes! Learnium allows you to upload and share notes, files, and other resources within your group. This helps ensure everyone has access to the materials they need for effective learning."
-        },
-        {
-            question: "What can the AI assistant do for me?",
-            answer: "The AI assistant is designed to answer questions, clarify doubts, and provide quick explanations on various topics. It's available 24/7 to support your learning journey."
-        },
-        {
-            question: "Is Learnium suitable for both students and professionals?",
-            answer: "Absolutely! Learnium caters to students, professionals, and lifelong learners. Whether you're preparing for exams, improving your skills, or collaborating on projects, Learnium provides the tools you need."
-        }
+        { question: "What is Learnium, and how does it work?", answer: "Learnium is a virtual study group platform where users can create or join groups, participate in online study sessions, share notes and files, and interact with an AI assistant for instant doubt resolution." },
+        { question: "How do I create or join a study group?", answer: "You can create a group by selecting a subject or field of interest and inviting members, or browse and join existing groups." },
+        { question: "What features are available during online study sessions?", answer: "Features include video conferencing, collaborative whiteboards, file sharing, live chat, and AI assistance for answering questions." },
+        { question: "Can I share notes and resources with my group members?", answer: "Yes! You can upload and share notes, files, and resources within your group." },
+        { question: "What can the AI assistant do for me?", answer: "It answers questions, clarifies doubts, and provides quick explanations on various topics 24/7." },
+        { question: "Is Learnium suitable for both students and professionals?", answer: "Absolutely! It caters to students, professionals, and lifelong learners for study, skill-building, and collaboration." }
     ];
 
-
     return (
-        <div className="w-[90%] sm:w-2/4 mx-auto my-10 bg-customCream rounded-lg shadow-lg overflow-hidden">
+        <div className=" lg:w-1/2 bg-[rgba(255,248,231,0.8)] backdrop-blur-lg rounded-3xl hover:shadow-2xl shadow-inner p-6">
             {faqs.map((faq, index) => (
-                <div key={index} className="border-b border-gray-200 last:border-b-0">
+                <div key={index} className="border-b border-gray-300/50">
                     <button
-                        className="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 focus:outline-none"
-                        onClick={() => setOpenAnswer(openAnswer === index ? -1 : index)}
+                        className="w-full px-6 py-4 flex justify-between items-center transition-all hover:bg-[rgba(255,248,231,0.9)] focus:outline-none rounded-lg"
+                        onClick={() => setOpenIndex(openIndex === index ? -1 : index)}
                     >
-                        <span className="font-medium text-gray-900">
-                            {faq.question}
-                        </span>
-                        {openAnswer === index ? (
-                            <ChevronUp className="h-5 w-5 text-purple-500" />
-                        ) : (
-                            <ChevronDown className="h-5 w-5 text-purple-500" />
-                        )}
+                        <span className="font-semibold text-gray-600">{faq.question}</span>
+                        {openIndex === index ? <ChevronUp className="h-6 w-6 text-blue-500" /> : <ChevronDown className="h-6 w-6 text-gray-500" />}
                     </button>
-
-                    {<div
-                        className={`px-6 bg-white overflow-hidden transition-all duration-200 ease-in-out 
-                        ${openAnswer === index ? 'max-h-48 py-4' : 'max-h-0'}`}>
-                        <p className="text-gray-600">{faq.answer}</p>
-                    </div>}
+                    <div className={` overflow-hidden transition-all duration-300 ease-in-out ${openIndex === index ? "max-h-48 opacity-100 py-4" : "max-h-0 opacity-0"}`}>
+                        <p className="text-gray-700 bg-white/80 p-4 rounded-lg shadow-sm">{faq.answer}</p>
+                    </div>
                 </div>
             ))}
         </div>
-    )
+    );
 }
 
-function FormHeading() {
+function ContactForm() {
+    const validationSchema = Yup.object().shape({
+        name: Yup.string().required("Name is required!"),
+        phoneNo: Yup.string().matches(/^\d{10}$/, "Phone number must be exactly 10 digits").required("Phone number is required!"),
+        email: Yup.string().email("Invalid email format").required("Email is required!"),
+        message: Yup.string().required("Message cannot be empty!"),
+    });
+
+    const initialValues = { name: "", phoneNo: "", email: "", message: "" };
+
+    const handleSubmit = (values, { resetForm }) => {
+        console.log("Form Submitted:", values);
+        resetForm();
+    };
+
     return (
-        <div className="text-center">
-            <h1 className=" text-3xl font-bold py-8">Have a Query?</h1>
-            <p className="mx-2"><i>Contact us to learn more about our platform and how you can upskill youself with others!</i></p>
+        <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
+            {({ isSubmitting }) => (
+                <Form className="w-full max-w-lg mx-auto bg-[rgba(255,248,231,0.9)] backdrop-blur-lg p-6 rounded-3xl shadow-lg ">
+                    {["name", "phoneNo", "email", "message"].map((field, index) => (
+                        <div className="mb-4" key={index}>
+                            <label htmlFor={field} className="block text-gray-700 text-sm">
+                                {field.charAt(0).toUpperCase() + field.slice(1)} <span className="text-red-500">*</span>
+                            </label>
+                            <Field
+                                className="w-full bg-white shadow-inner shadow-lg bg-transparent rounded-lg px-3 py-2 mt-1 text-gray-700 focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition-all"
+                                type={field === "message" ? "textarea" : "text"}
+                                id={field}
+                                name={field}
+                            />
+                            <ErrorMessage name={field} component="span" className="text-red-500 text-sm" />
+                        </div>
+                    ))}
+                    <button
+                        className="w-full py-3 mt-4 text-white font-semibold bg-customPurple rounded-lg shadow-md hover:from-yellow-500 hover:to-orange-600 transition-all transform hover:scale-95 disabled:opacity-50"
+                        type="submit"
+                        disabled={isSubmitting}
+                    >
+                        {isSubmitting ? "Submitting..." : "Submit"}
+                    </button>
+                </Form>
+            )}
+        </Formik>
+    );
+}
+
+function FormSection() {
+    return (
+        <div className="lg:w-1/2 bg-[rgba(255,248,231,0.9)] backdrop-blur-lg rounded-3xl hover:shadow-2xl p-8 shadow-inner">
+            <div className="text-center">
+                <h1 className="text-4xl font-extrabold py-2 text-customPurple">Have a Query?</h1>
+                <p className="text-gray-500 mx-6 mb-4">Contact us to learn more about our platform and how you can upskill yourself with others!</p>
+            </div>
+            <ContactForm />
         </div>
-    )
-}
-
-function Form() {
-    const { register,
-        handleSubmit,
-        watch,
-        formState: { errors },
-    } = useForm({ mode: "onChange" });
-
-
-    const onSubmit = async (formData) => {
-        console.log(formData);
-    }
-    const handleError = (err) => {
-        console.log(err);
-    }
-
-    const formOption = {
-        name: { required: "Name is required !" },
-        phoneNo: {
-            required: "Phone number is required !",
-            minLength: {
-                value: 10,
-                message: "Phone number must be of 10 digits"
-            },
-        },
-        email: { required: "Email is required !" },
-        message: { required: "Message cannot be empty !" }
-    }
-    return (
-        <form onSubmit={handleSubmit(onSubmit, handleError)}>
-            <section className="max-w-80 lg:w-96 mx-auto py-6 flex flex-col text-black">
-                <div className="w-full mt-5">
-                    <div >
-                        <label htmlFor="name">Name <span className="text-red-600">*</span></label>
-                    </div>
-                    <input
-                        className="w-full border-2 px-2 py-1"
-                        type="text"
-                        id="name"
-                        {...register("name", formOption.name)}
-                    />
-                    <span className="text-red-600 text-sm">
-                        {errors?.name && errors.name.message}
-                    </span>
-                </div>
-                <div className="w-full mt-5">
-                    <div>
-                        <label htmlFor="phoneNo">Phone no.<span className="text-red-600">*</span></label>
-                    </div>
-                    <input
-                        className="w-full border-2 px-2 py-1"
-                        type="tel"
-                        id="phoneNo"
-                        maxLength={10}
-                        {...register("phoneNo", formOption.phoneNo)}
-                    />
-                    <span className="text-red-600 text-sm">
-                        {errors?.phoneNo && errors.phoneNo.message}
-                    </span>
-                </div>
-                <div className="w-full mt-5">
-                    <div>
-                        <label htmlFor="email">Email<span className="text-red-600">*</span></label>
-                    </div>
-                    <input
-                        className="w-full border-2 px-2 py-1"
-                        type="email"
-                        id="email"
-                        {...register("email", formOption.email)}
-                    />
-                    <span className="text-red-600 text-sm">
-                        {errors?.email && errors.email.message}
-                    </span>
-                </div>
-                <div className="w-full mt-5">
-                    <div>
-                        <label htmlFor="feedback">Message<span className="text-red-600">*</span></label>
-                    </div>
-                    <textarea
-                        className="w-full border-2 px-2 py-1"
-                        id="feedback"
-                        {...register("message", formOption.message)}
-                    />
-                    <span className="text-red-600 text-sm">
-                        {errors?.message && errors.message.message}
-                    </span>
-                </div>
-
-                <button className="w-full my-5 bg-green-600 text-white transition-all py-2 hover:scale-95">Submit</button>
-
-            </section>
-        </form>
-    )
-}
-
-function FormCover({ children }) {
-    return (
-        <div className="h-fit w-[90%] sm:container sm:max-w-[35rem] my-40 mx-auto rounded-md bg-customCream shadow-xl">
-            {children}
-        </div>
-    )
-}
-
-function Main() {
-    return (
-        <div className="">
-            <Cover>
-                <h2 className="text-4xl text-center font-bold py-28 z-10">Frequently Asked Questions</h2>
-            </Cover>
-            <FAQ />
-            <FormCover>
-                <FormHeading />
-                <Form />
-            </FormCover>
-        </div>
-    )
+    );
 }
 
 function Contact() {
-    return (<>
-        <Main />
-    </>)
+    return (
+        <div>
+            <Cover>
+                <h2 className="text-5xl text-center font-extrabold py-28 z-10 text-black drop-shadow-lg">Frequently Asked<span className="text-customOrange"> Questions</span> ?</h2>
+            </Cover>
+            <div className="container mx-auto flex flex-col lg:flex-row gap-8 my-12 px-4 lg:px-12">
+                <FAQ />
+                <FormSection />
+            </div>
+        </div>
+    );
 }
 
-export default Contact
+export default Contact;
