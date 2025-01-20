@@ -4,17 +4,17 @@ import "../../styles/About.css";
 function Cards() {
   const cardData = [
     {
-      bg: "bg-gradient-to-br from-customPurple to-customcream hover:to-gray-600",
+      bg: "bg-gradient-to-br from-customPurple to-gray-400 hover:to-gray-600",
       heading: "Collaborative Learning",
       para: "Unlock the power of teamwork! Share notes, discuss ideas, and support each other in a connected learning environment.",
     },
     {
-      bg: "bg-gradient-to-br from-customPurple to-customcream hover:to-gray-600",
+      bg: "bg-gradient-to-br from-customPurple to-gray-400 hover:to-gray-600",
       heading: "Flexible & Accessible",
       para: "Learn anytime, anywhere. Join study groups, participate in discussions, and access resources from any device, 24/7.",
     },
     {
-      bg: "bg-gradient-to-br from-customPurple to-customcream hover:to-gray-600",
+      bg: "bg-gradient-to-br from-customPurple to-gray-400 hover:to-gray-600",
       heading: "Supportive Community",
       para: "More than just studying—it's a family. Find motivation, share knowledge, and celebrate academic milestones together.",
     },
